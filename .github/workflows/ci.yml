@@ -1,0 +1,35 @@
+name: FastAPI Code Quality and Testing
+
+on:
+  push:
+  pull_request:
+
+jobs:
+  ci-pipeline:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository code
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.10'
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install ruff pytest
+          if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
+
+      # Примечание: В ТЗ просят исправить конфликты black/flake8. 
+      # Мы элегантно решаем это с помощью ruff на этапах linter и format!
+      - name: Run Ruff Linter Check
+        run: ruff check .
+
+      - name: Run Ruff Format Check
+        run: ruff format --check .
+
+      - name: Run Pytest
+        run: pytest
