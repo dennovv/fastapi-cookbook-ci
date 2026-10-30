@@ -1,17 +1,16 @@
 from typing import List
-from fastapi import FastAPI, Depends, HTTPException, status
+
+from database import engine, get_db
+from fastapi import Depends, FastAPI, HTTPException, status
+from sqlalchemy import asc, desc
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.future import select
-from sqlalchemy import desc, asc
 
 import models
 import schemas
-from database import engine, get_db
 
 app = FastAPI(
-    title="API Кулинарной Книги",
-    description="Production-ready сервис для управления рецептами",
-    version="1.0.0"
+    title="API Кулинарной Книги", description="Production-ready сервис для управления рецептами", version="1.0.0"
 )
 
 
@@ -30,10 +29,7 @@ async def get_recipes(db: AsyncSession = Depends(get_db)):
     (количество просмотров - убывание), затем по времени готовки (возрастание).
     """
     # Пишем сортировку строго по ТЗ
-    query = select(models.Recipe).order_by(
-        desc(models.Recipe.views),
-        asc(models.Recipe.cooking_time)
-    )
+    query = select(models.Recipe).order_by(desc(models.Recipe.views), asc(models.Recipe.cooking_time))
     result = await db.execute(query)
     return result.scalars().all()
 
@@ -49,10 +45,7 @@ async def get_recipe_detail(recipe_id: int, db: AsyncSession = Depends(get_db)):
     recipe = result.scalar_one_or_none()
 
     if not recipe:
-        raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND,
-            detail=f"Рецепт с id {recipe_id} не найден"
-        )
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=f"Рецепт с id {recipe_id} не найден")
 
     # Инкрементируем просмотры
     recipe.views += 1
