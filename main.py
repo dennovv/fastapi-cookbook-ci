@@ -1,6 +1,6 @@
-from typing import List
+from typing import Annotated, List
 
-from fastapi import Annotated, Depends, FastAPI, HTTPException, status
+from fastapi import Depends, FastAPI, HTTPException, status
 from sqlalchemy import asc, desc
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.future import select
