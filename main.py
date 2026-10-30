@@ -1,4 +1,4 @@
-from typing import Annotated, List
+from typing import List
 
 from fastapi import Depends, FastAPI, HTTPException, status
 from sqlalchemy import asc, desc
@@ -21,14 +21,14 @@ async def startup():
 
 
 @app.get("/recipes", response_model=List[schemas.RecipeListOut], status_code=status.HTTP_200_OK)
-async def get_recipes(db: Annotated[AsyncSession, Depends(get_db)]):
+async def get_recipes(db: AsyncSession = Depends(get_db)):
     query = select(models.Recipe).order_by(desc(models.Recipe.views), asc(models.Recipe.cooking_time))
     result = await db.execute(query)
     return result.scalars().all()
 
 
 @app.get("/recipes/{recipe_id}", response_model=schemas.RecipeDetailOut, status_code=status.HTTP_200_OK)
-async def get_recipe_detail(recipe_id: int, db: Annotated[AsyncSession, Depends(get_db)]):
+async def get_recipe_detail(recipe_id: int, db: AsyncSession = Depends(get_db)):
     result = await db.execute(select(models.Recipe).where(models.Recipe.id == recipe_id))
     recipe = result.scalar_one_or_none()
 
@@ -43,7 +43,7 @@ async def get_recipe_detail(recipe_id: int, db: Annotated[AsyncSession, Depends(
 
 
 @app.post("/recipes", response_model=schemas.RecipeDetailOut, status_code=status.HTTP_201_CREATED)
-async def create_recipe(recipe_in: schemas.RecipeCreate, db: Annotated[AsyncSession, Depends(get_db)]):
+async def create_recipe(recipe_in: schemas.RecipeCreate, db: AsyncSession = Depends(get_db)):
     new_recipe = models.Recipe(**recipe_in.dict())
     db.add(new_recipe)
     await db.commit()
