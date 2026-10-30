@@ -1,7 +1,7 @@
 from typing import List
 
 from database import engine, get_db
-from fastapi import Depends, FastAPI, HTTPException, status
+from fastapi import Annotated, Depends, FastAPI, HTTPException, status
 from sqlalchemy import asc, desc
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.future import select
@@ -23,7 +23,7 @@ async def startup():
 
 # 1. GET /recipes — Получить список всех рецептов (с сортировкой)
 @app.get("/recipes", response_model=List[schemas.RecipeListOut], status_code=status.HTTP_200_OK)
-async def get_recipes(db: AsyncSession = Depends(get_db)):
+async def get_recipes(db: Annotated[AsyncSession, Depends(get_db)]):
     """
     Возвращает список всех рецептов, отсортированных по популярности
     (количество просмотров - убывание), затем по времени готовки (возрастание).
@@ -36,7 +36,7 @@ async def get_recipes(db: AsyncSession = Depends(get_db)):
 
 # 2. GET /recipes/{recipe_id} — Получить детальную информацию о рецепте (+1 к просмотру)
 @app.get("/recipes/{recipe_id}", response_model=schemas.RecipeDetailOut, status_code=status.HTTP_200_OK)
-async def get_recipe_detail(recipe_id: int, db: AsyncSession = Depends(get_db)):
+async def get_recipe_detail(recipe_id: int, db: Annotated[AsyncSession, Depends(get_db)]):
     """
     Возвращает детальную информацию о конкретном рецепте.
     Каждое открытие увеличивает счетчик просмотров на 1.
@@ -57,7 +57,7 @@ async def get_recipe_detail(recipe_id: int, db: AsyncSession = Depends(get_db)):
 
 # 3. POST /recipes — Создать новый рецепт
 @app.post("/recipes", response_model=schemas.RecipeDetailOut, status_code=status.HTTP_201_CREATED)
-async def create_recipe(recipe_in: schemas.RecipeCreate, db: AsyncSession = Depends(get_db)):
+async def create_recipe(recipe_in: schemas.RecipeCreate, db: Annotated[AsyncSession, Depends(get_db)]):
     """
     Создает новый рецепт в кулинарной книге.
     """
