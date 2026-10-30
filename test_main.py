@@ -1,8 +1,10 @@
 import asyncio
-from database import engine
-import models
+
 from fastapi.testclient import TestClient
+
+from database import engine
 from main import app
+import models
 
 # Принудительно создаем таблицы в базе данных перед запуском тестов в CI
 async def init_test_db():
