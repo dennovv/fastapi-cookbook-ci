@@ -1,6 +1,5 @@
 from typing import List
 
-from database import engine, get_db
 from fastapi import Annotated, Depends, FastAPI, HTTPException, status
 from sqlalchemy import asc, desc
 from sqlalchemy.ext.asyncio import AsyncSession
@@ -8,6 +7,7 @@ from sqlalchemy.future import select
 
 import models
 import schemas
+from database import engine, get_db
 
 app = FastAPI(
     title="API Кулинарной Книги", description="Production-ready сервис для управления рецептами", version="1.0.0"
